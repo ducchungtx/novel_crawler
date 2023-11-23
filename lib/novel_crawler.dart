@@ -10,7 +10,7 @@ Future<List<Link>> getListConversation() async {
   final url = '$mainUrl/daily-english-conversation-topics/';
   final page = await scrapePage(url);
 
-  final links = page.querySelectorAll('a.tve-froala').map((element) {
+  final links = page.querySelectorAll('.tcb-flex-row a').map((element) {
     return Link(
       url: element.attributes['href']!,
       name: element.text!.trim(),
