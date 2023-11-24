@@ -28,8 +28,10 @@ Future<Conversation> getConversation(String url) async {
   final audioUrl =
       page.querySelector('.wp-audio-shortcode a')!.attributes['href']!;
 
-  final divs = page.querySelector('div.tve_shortcode_rendered');
+  var divs = page.querySelector('div.tve_shortcode_rendered');
   final List<String> texts = [];
+  divs ??= page.querySelector('.awr');
+
   divs?.children.map((e) {
     if (e.previousNode != null) {
       final text = e.previousNode!.text!.trim();
@@ -56,17 +58,19 @@ Future<Conversation> getConversation(String url) async {
       }
     }
   }).toList();
-
-  final audioSections = List.generate(
-    audioUrls.length,
-    (index) => AudioSection(
-      content: texts[index],
-      url: audioUrls[index],
-    ),
-  );
+  List<AudioSection> audioSections = [];
+  if (texts.isNotEmpty) {
+    audioSections = List.generate(
+      audioUrls.length,
+      (index) => AudioSection(
+        content: texts[index],
+        url: audioUrls[index],
+      ),
+    );
+  }
 
   return Conversation(
-    audioSections,
+    audioSections: audioSections,
     title: title,
     videoUrl: videoUrl,
     audioUrl: audioUrl,
@@ -143,7 +147,7 @@ Future<Phrase> getPhraseAndSentence(String url) async {
   );
 
   return Phrase(
-    title: audioUrl,
+    title: title,
     audioUrl: audioUrl,
     audioSections: audioSections,
     textSections: texts,
