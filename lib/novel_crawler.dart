@@ -140,14 +140,23 @@ Future<Phrase> getPhraseAndSentence(String url) async {
 
   final audioSections = List.generate(
     audioUrls.length,
-    (index) => AudioSection(
-      content: texts[index + 1],
-      url: audioUrls[index],
-    ),
+    (index) {
+      print(texts[index]);
+      if (texts[index + 1].toLowerCase().contains("EXAMPLES")) {
+        return AudioSection(
+          content: texts[index + 1],
+          url: audioUrls[index],
+        );
+      }
+      return AudioSection(
+        content: texts[index + 2],
+        url: audioUrls[index],
+      );
+    },
   );
 
   return Phrase(
-    title: title,
+    title: title.trim(),
     audioUrl: audioUrl,
     audioSections: audioSections,
     textSections: texts,
