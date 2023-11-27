@@ -1,10 +1,36 @@
 import 'package:novel_crawler/config/config.dart';
+import 'package:novel_crawler/models/expression.dart';
 import 'package:novel_crawler/scraper/scraper.dart';
 
 import 'package:novel_crawler/models/audio_section.dart';
 import 'package:novel_crawler/models/conversation.dart';
 import 'package:novel_crawler/models/link.dart';
 import 'package:novel_crawler/models/phrase_and_sentence.dart';
+
+Future<List<Link>> getListExpressions() async {
+  final url = '$mainUrl/common-expressions-english/';
+  final page = await scrapePage(url);
+
+  final links = page.querySelectorAll('.tcb-flex-row a').map((element) {
+    return Link(
+      url: element.attributes['href']!,
+      name: element.text!.trim(),
+    );
+  }).toList();
+  return links;
+}
+
+Future<Expression> getExpression(String url) async {
+  final page = await scrapePage(url);
+  final title = page.querySelector('h1')!.text!.trim();
+  final audioUrl =
+      page.querySelector('.wp-audio-shortcode a')!.attributes['href']!;
+  return Expression(
+    title: title,
+    audioUrl: audioUrl,
+    audioSections: [],
+  );
+}
 
 Future<List<Link>> getListConversation() async {
   final url = '$mainUrl/daily-english-conversation-topics/';
