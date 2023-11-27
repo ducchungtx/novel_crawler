@@ -142,7 +142,7 @@ Future<Phrase> getPhraseAndSentence(String url) async {
     audioUrls.length,
     (index) {
       print(texts[index]);
-      if (texts[index + 1].toLowerCase().contains("EXAMPLES")) {
+      if (texts[index].toLowerCase().contains("examples")) {
         return AudioSection(
           content: texts[index + 1],
           url: audioUrls[index],

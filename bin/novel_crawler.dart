@@ -10,6 +10,7 @@ void main(List<String> arguments) {
 void getData() async {
   // getConversation();
   getPhraseAndSentence();
+  // testDownloadMp3();
 }
 
 void getConversation() async {
@@ -46,4 +47,9 @@ void getPhraseAndSentence() async {
   }
   createJsonFile(
       jsonEncode(contentPhrasesAndSentences), "linkPhrasesAndSentences.json");
+}
+
+void testDownloadMp3() {
+  downloadAndSaveMP3("001. Are you sure…?",
+      "https://basicenglishspeaking.com/wp-content/uploads/audio/001.mp3");
 }
