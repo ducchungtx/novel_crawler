@@ -25,6 +25,37 @@ Future<Expression> getExpression(String url) async {
   final title = page.querySelector('h1')!.text!.trim();
   final audioUrl =
       page.querySelector('.wp-audio-shortcode a')!.attributes['href']!;
+
+  final divs = page.querySelector('div.awr');
+  final List<String> texts = [];
+  divs!.children.map((e) {
+    final text = e.text!.trim();
+    if (e.className != "cmt acm" && text != title) {
+      if (text.isNotEmpty) {
+        if (!text.contains("http://") &&
+            !text.contains("Download Full Lessons") &&
+            !text.contains(" Shares")) {
+          if (text == "General greetings (Formal)") {
+            print("General greetings (Formal)");
+            // check the nextNode when to have the content
+          }
+          texts.add(e.text!.trim());
+        }
+      } else {
+        if (e.previousNode != null) {
+          final text = e.previousNode!.text!.trim();
+          if (text.isNotEmpty) {
+            if (!text.contains(" Shares")) {
+              texts.add(text);
+            }
+          }
+        }
+      }
+    }
+  }).toList();
+
+  print(texts);
+
   return Expression(
     title: title,
     audioUrl: audioUrl,
