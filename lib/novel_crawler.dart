@@ -162,3 +162,13 @@ Future<Phrase> getPhraseAndSentence(String url) async {
     textSections: texts,
   );
 }
+
+
+Future getListTest() async {
+  final page = await scrapePage("https://www.mtlnovel.com/wasteland-commander/");
+
+  final content = await page.querySelector('body');
+
+  print(content!.text!.trim());
+
+}

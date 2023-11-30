@@ -9,7 +9,8 @@ void main(List<String> arguments) {
 
 void getData() async {
   // getConversation();
-  getPhraseAndSentence();
+  // getPhraseAndSentence();
+  // novel_crawler.getListTest();
 }
 
 void getConversation() async {
