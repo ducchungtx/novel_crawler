@@ -17,7 +17,19 @@ void getData() async {
 
 void getExpressions() async {
   final linkExpressions = await novel_crawler.getListExpressions();
-  print(linkExpressions);
+  
+  final List<Map<String, dynamic>> contentConversations = [];
+
+  for (var e in linkExpressions) {
+    final contentConversation = await novel_crawler.getExpression(e.url);
+    final contentMap = contentConversation.toJson();
+
+    // Thêm đánh số vào danh sách
+    contentMap['index'] = contentConversations.length + 1;
+    contentConversations.add(contentMap);
+  }
+
+  createJsonFile(jsonEncode(contentConversations), "linkExpressions.json");
 }
 
 void testGetExpression() async {

@@ -10,4 +10,13 @@ class Expression {
     required this.audioUrl,
     required this.audioSections,
   });
+
+  // convert to json
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'audioUrl': audioUrl,
+      'audioSections': audioSections.map((e) => e.toJson()).toList(),
+    };
+  }
 }
