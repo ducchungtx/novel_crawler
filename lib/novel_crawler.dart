@@ -77,6 +77,7 @@ Future<List<Link>> getListConversation() async {
 }
 
 Future<Conversation> getConversation(String url) async {
+  print(url);
 // Future getConversation(String url) async {
   final page = await scrapePage(url);
 

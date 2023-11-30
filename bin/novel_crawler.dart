@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:novel_crawler/novel_crawler.dart' as novel_crawler;
+import 'package:novel_crawler/scraper/scraper_audio.dart' as scraper_audio;
 import 'package:novel_crawler/utils/utils.dart';
 
 void main(List<String> arguments) {
@@ -12,7 +13,9 @@ void getData() async {
   // getPhraseAndSentence();
   // testDownloadMp3();
   // getExpressions();
-  testGetExpression();
+
+  // download audio
+  scraper_audio.downloadConversationList();
 }
 
 void getExpressions() async {
@@ -30,13 +33,6 @@ void getExpressions() async {
   }
 
   createJsonFile(jsonEncode(contentConversations), "linkExpressions.json");
-}
-
-void testGetExpression() async {
-  final expression = await novel_crawler.getExpression(
-      'https://basicenglishspeaking.com/greeting-english-different-ways-say-hello/');
-
-  print(expression);
 }
 
 void getConversation() async {
@@ -75,7 +71,3 @@ void getPhraseAndSentence() async {
       jsonEncode(contentPhrasesAndSentences), "linkPhrasesAndSentences.json");
 }
 
-void testDownloadMp3() {
-  downloadAndSaveMP3("001. Are you sure…?",
-      "https://basicenglishspeaking.com/wp-content/uploads/audio/001.mp3");
-}

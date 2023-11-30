@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 
 Future<void> createJsonFile(String content, String filename) async {
   // Tạo thư mục nếu nó chưa tồn tại
@@ -18,12 +19,12 @@ Future<void> createJsonFile(String content, String filename) async {
   print('File created: $filename');
 }
 
-void downloadAndSaveMP3(String title, String audioUrl) async {
+Future<String?> downloadAndSaveMP3(String title, String audioUrl, String mainFolder) async {
   // Chuyển đổi title thành tên thư mục
-  String folderName = title.toLowerCase().replaceAll(' ', '_');
+  String folderName = title.toLowerCase().replaceAll(' ', '_').replaceAll('/', '');
 
   // Tạo thư mục nếu nó không tồn tại
-  Directory folder = Directory(folderName);
+  Directory folder = Directory(join(mainFolder, folderName));
   if (!folder.existsSync()) {
     folder.createSync();
   }
@@ -32,16 +33,23 @@ void downloadAndSaveMP3(String title, String audioUrl) async {
   String fileName = audioUrl.split('/').last;
 
   // Tạo đường dẫn đầy đủ đến file mp3
-  String filePath = '$folderName/$fileName';
+  String filePath = join(folder.path, fileName);
 
   // Tải xuống file mp3 từ URL
   var response = await http.get(Uri.parse(audioUrl));
   if (response.statusCode == 200) {
-    // Lưu trữ file mp3 vào thư mục tương ứng
-    File file = File(filePath);
-    file.writeAsBytesSync(response.bodyBytes);
-    print('Downloaded and saved: $filePath');
+    // Kiểm tra xem response body có dữ liệu không
+    if (response.body.isNotEmpty) {
+      // Lưu trữ file mp3 vào thư mục tương ứng
+      File file = File(filePath);
+      file.writeAsBytesSync(response.bodyBytes);
+      print('Downloaded and saved: $filePath');
+      return filePath;
+    } else {
+      print('Empty response body for: $audioUrl');
+    }
   } else {
     print('Failed to download: $audioUrl');
   }
+  return null; // Trả về null khi tải về thất bại
 }
