@@ -10,7 +10,21 @@ void main(List<String> arguments) {
 void getData() async {
   // getConversation();
   // getPhraseAndSentence();
-  // novel_crawler.getListTest();
+  // testDownloadMp3();
+  // getExpressions();
+  testGetExpression();
+}
+
+void getExpressions() async {
+  final linkExpressions = await novel_crawler.getListExpressions();
+  print(linkExpressions);
+}
+
+void testGetExpression() async {
+  final expression = await novel_crawler.getExpression(
+      'https://basicenglishspeaking.com/greeting-english-different-ways-say-hello/');
+
+  print(expression);
 }
 
 void getConversation() async {
@@ -47,4 +61,9 @@ void getPhraseAndSentence() async {
   }
   createJsonFile(
       jsonEncode(contentPhrasesAndSentences), "linkPhrasesAndSentences.json");
+}
+
+void testDownloadMp3() {
+  downloadAndSaveMP3("001. Are you sure…?",
+      "https://basicenglishspeaking.com/wp-content/uploads/audio/001.mp3");
 }

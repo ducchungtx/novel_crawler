@@ -1,10 +1,67 @@
 import 'package:novel_crawler/config/config.dart';
+import 'package:novel_crawler/models/expression.dart';
 import 'package:novel_crawler/scraper/scraper.dart';
 
 import 'package:novel_crawler/models/audio_section.dart';
 import 'package:novel_crawler/models/conversation.dart';
 import 'package:novel_crawler/models/link.dart';
 import 'package:novel_crawler/models/phrase_and_sentence.dart';
+
+Future<List<Link>> getListExpressions() async {
+  final url = '$mainUrl/common-expressions-english/';
+  final page = await scrapePage(url);
+
+  final links = page.querySelectorAll('.tcb-flex-row a').map((element) {
+    return Link(
+      url: element.attributes['href']!,
+      name: element.text!.trim(),
+    );
+  }).toList();
+  return links;
+}
+
+Future<Expression> getExpression(String url) async {
+  final page = await scrapePage(url);
+  final title = page.querySelector('h1')!.text!.trim();
+  final audioUrl =
+      page.querySelector('.wp-audio-shortcode a')!.attributes['href']!;
+
+  final divs = page.querySelector('div.awr');
+  final List<String> texts = [];
+  divs!.children.map((e) {
+    final text = e.text!.trim();
+    if (e.className != "cmt acm" && text != title) {
+      if (text.isNotEmpty) {
+        if (!text.contains("http://") &&
+            !text.contains("Download Full Lessons") &&
+            !text.contains(" Shares")) {
+          if (text == "General greetings (Formal)") {
+            print("General greetings (Formal)");
+            // check the nextNode when to have the content
+          }
+          texts.add(e.text!.trim());
+        }
+      } else {
+        if (e.previousNode != null) {
+          final text = e.previousNode!.text!.trim();
+          if (text.isNotEmpty) {
+            if (!text.contains(" Shares")) {
+              texts.add(text);
+            }
+          }
+        }
+      }
+    }
+  }).toList();
+
+  print(texts);
+
+  return Expression(
+    title: title,
+    audioUrl: audioUrl,
+    audioSections: [],
+  );
+}
 
 Future<List<Link>> getListConversation() async {
   final url = '$mainUrl/daily-english-conversation-topics/';
@@ -142,7 +199,7 @@ Future<Phrase> getPhraseAndSentence(String url) async {
     audioUrls.length,
     (index) {
       print(texts[index]);
-      if (texts[index + 1].toLowerCase().contains("EXAMPLES")) {
+      if (texts[index].toLowerCase().contains("examples")) {
         return AudioSection(
           content: texts[index + 1],
           url: audioUrls[index],
