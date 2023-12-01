@@ -19,11 +19,14 @@ Future<void> createJsonFile(String content, String filename) async {
   print('File created: $filename');
 }
 
-Future<String?> downloadAndSaveMP3(String title, String audioUrl, String mainFolder) async {
+Future<String?> downloadAndSaveMP3(
+    String title, String audioUrl, String mainFolder) async {
   // Chuyển đổi title thành tên thư mục
-  String folderName = title.toLowerCase().replaceAll(' ', '_').replaceAll('/', '');
+  String folderName =
+      title.toLowerCase().replaceAll(' ', '_').replaceAll('/', '');
 
   // Tạo thư mục nếu nó không tồn tại
+  // ! lỗi tạo folder theo tiêu đề. Mai fix đi nhé
   Directory folder = Directory(join(mainFolder, folderName));
   if (!folder.existsSync()) {
     folder.createSync();

@@ -196,18 +196,27 @@ Future<Phrase> getPhraseAndSentence(String url) async {
     }
   }).toList();
 
+  int newIndex = 0;
   final audioSections = List.generate(
     audioUrls.length,
     (index) {
-      print(texts[index]);
-      if (texts[index].toLowerCase().contains("examples")) {
+      if (texts[index].contains("->")) {
+        newIndex = index + 2;
         return AudioSection(
-          content: texts[index + 1],
+          content: texts[newIndex],
           url: audioUrls[index],
         );
       }
+      if (texts[index].toLowerCase().contains("examples")) {
+        newIndex++;
+        return AudioSection(
+          content: texts[newIndex],
+          url: audioUrls[index],
+        );
+      }
+      newIndex++;
       return AudioSection(
-        content: texts[index + 2],
+        content: texts[newIndex],
         url: audioUrls[index],
       );
     },
@@ -221,12 +230,11 @@ Future<Phrase> getPhraseAndSentence(String url) async {
   );
 }
 
-
 Future getListTest() async {
-  final page = await scrapePage("https://www.mtlnovel.com/wasteland-commander/");
+  final page =
+      await scrapePage("https://www.mtlnovel.com/wasteland-commander/");
 
   final content = await page.querySelector('body');
 
   print(content!.text!.trim());
-
 }

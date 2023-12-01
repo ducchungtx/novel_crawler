@@ -11,16 +11,18 @@ void main(List<String> arguments) {
 void getData() async {
   // getConversation();
   // getPhraseAndSentence();
+  // getPhraseAndSentenceTest();
   // testDownloadMp3();
   // getExpressions();
 
   // download audio
-  scraper_audio.downloadConversationList();
+  // scraper_audio.downloadConversationList();
+  scraper_audio.downloadPhraseList();
 }
 
 void getExpressions() async {
   final linkExpressions = await novel_crawler.getListExpressions();
-  
+
   final List<Map<String, dynamic>> contentConversations = [];
 
   for (var e in linkExpressions) {
@@ -59,6 +61,7 @@ void getPhraseAndSentence() async {
   final List<Map<String, dynamic>> contentPhrasesAndSentences = [];
 
   for (var e in linkPhrasesAndSentences) {
+    print(e.url);
     final contentPhraseAndSentence =
         await novel_crawler.getPhraseAndSentence(e.url);
     final contentMap = contentPhraseAndSentence.toJson();
@@ -71,3 +74,7 @@ void getPhraseAndSentence() async {
       jsonEncode(contentPhrasesAndSentences), "linkPhrasesAndSentences.json");
 }
 
+void getPhraseAndSentenceTest() async {
+  final linkPhrasesAndSentences = await novel_crawler.getPhraseAndSentence(
+      "https://basicenglishspeaking.com/037-id-hate-for-you-to/");
+}
