@@ -245,7 +245,7 @@ Future<List<Link>> getListPhrasalVerbs() async {
   return links;
 }
 
-Future getPhrasalVerbs(String url) async {
+Future<PhrasalVerb> getPhrasalVerbs(String url) async {
   final page = await scrapePage(url);
 
   final title = page.querySelector('.entry-title')!.text!.trim();

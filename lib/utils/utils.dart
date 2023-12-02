@@ -25,7 +25,6 @@ Future<String?> downloadAndSaveMP3(
   String folderName = convertTitle(title);
 
   // Tạo thư mục nếu nó không tồn tại
-  // ! lỗi tạo folder theo tiêu đề. Mai fix đi nhé
   Directory folder = Directory(join(mainFolder, folderName));
   if (!folder.existsSync()) {
     folder.createSync();
