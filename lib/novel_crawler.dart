@@ -1,5 +1,7 @@
 import 'package:novel_crawler/config/config.dart';
+import 'package:novel_crawler/models/content_section.dart';
 import 'package:novel_crawler/models/expression.dart';
+import 'package:novel_crawler/models/phrasal_verb.dart';
 import 'package:novel_crawler/scraper/scraper.dart';
 
 import 'package:novel_crawler/models/audio_section.dart';
@@ -230,11 +232,73 @@ Future<Phrase> getPhraseAndSentence(String url) async {
   );
 }
 
-Future getListTest() async {
-  final page =
-      await scrapePage("https://www.mtlnovel.com/wasteland-commander/");
+Future<List<Link>> getListPhrasalVerbs() async {
+  final url = '$mainUrl/phrasal-verbs/';
+  final page = await scrapePage(url);
 
-  final content = await page.querySelector('body');
+  final links = page.querySelectorAll('h3 a').map((element) {
+    return Link(
+      url: element.attributes['href']!,
+      name: element.text!.trim(),
+    );
+  }).toList();
+  return links;
+}
 
-  print(content!.text!.trim());
+Future getPhrasalVerbs(String url) async {
+  final page = await scrapePage(url);
+
+  final title = page.querySelector('.entry-title')!.text!.trim();
+
+  final contentContainer = page.querySelectorAll('.wp-block-group');
+
+  // contentSection
+  List<ContentSection> contentSections = [];
+
+  contentContainer.map((element) {
+    final title = element.querySelector('h4')!.text!.trim();
+    final desc = element.querySelector('p')!.text!.trim();
+    final audioContainer = element.querySelectorAll('.sc_player_container1');
+    final audioUrls = [];
+    audioContainer.map((element) {
+      final button = element.querySelector('.myButton_play');
+      if (button != null) {
+        final onclickValue = button.attributes['onclick'];
+        final urlMatch =
+            RegExp(r"'(http://[^']*)'").firstMatch(onclickValue ?? '');
+
+        if (urlMatch != null) {
+          final mp3Url = urlMatch.group(1);
+          audioUrls.add(mp3Url);
+        }
+      }
+    }).toList();
+
+    // get list texts
+    var text = element.text!.trim();
+    // Thay thế các dấu xuống dòng liên tiếp bằng một dấu xuống dòng duy nhất
+    String cleanedText = text.replaceAll(RegExp(r'\n+'), '\n');
+    // Tách văn bản thành danh sách các dòng
+    List<String> lines = cleanedText.split('\n');
+    // Loại bỏ các dòng trống
+    List<String> texts = lines.where((line) => line.trim().isNotEmpty).toList();
+    // Xoá 2 item 0, 1 trong list texts
+    texts.removeAt(0);
+    texts.removeAt(0);
+    // Tạo list content
+    List<AudioSection> audioSections = List.generate(audioUrls.length, (index) {
+      return AudioSection(
+        content: texts[index].trim(),
+        url: audioUrls[index],
+      );
+    });
+
+    contentSections.add(ContentSection(
+      title: title,
+      desc: desc,
+      audioSections: audioSections,
+    ));
+  }).toList();
+
+  return PhrasalVerb(title: title, contents: contentSections);
 }

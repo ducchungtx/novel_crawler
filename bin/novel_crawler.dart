@@ -17,7 +17,11 @@ void getData() async {
 
   // download audio
   // scraper_audio.downloadConversationList();
-  scraper_audio.downloadPhraseList();
+
+  // getListPhrasalVerbs
+  var content = await novel_crawler.getPhrasalVerbs(
+      "https://basicenglishspeaking.com/10-common-phrasal-verbs-with-pick-meanings-and-example-sentences-audio/");
+  print(content);
 }
 
 void getExpressions() async {
