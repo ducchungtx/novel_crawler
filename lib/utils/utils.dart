@@ -22,8 +22,7 @@ Future<void> createJsonFile(String content, String filename) async {
 Future<String?> downloadAndSaveMP3(
     String title, String audioUrl, String mainFolder) async {
   // Chuyển đổi title thành tên thư mục
-  String folderName =
-      title.toLowerCase().replaceAll(' ', '_').replaceAll('/', '');
+  String folderName = convertTitle(title);
 
   // Tạo thư mục nếu nó không tồn tại
   // ! lỗi tạo folder theo tiêu đề. Mai fix đi nhé
@@ -55,4 +54,14 @@ Future<String?> downloadAndSaveMP3(
     print('Failed to download: $audioUrl');
   }
   return null; // Trả về null khi tải về thất bại
+}
+
+String convertTitle(String originalTitle) {
+  // Loại bỏ các ký tự không mong muốn
+  String cleanedTitle = originalTitle.replaceAll(RegExp(r'[^\w\s]'), '');
+
+  // Thay thế khoảng trắng bằng dấu gạch dưới
+  String underscoredTitle = cleanedTitle.replaceAll(' ', '_');
+
+  return underscoredTitle.toLowerCase();
 }
