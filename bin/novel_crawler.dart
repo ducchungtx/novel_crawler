@@ -12,12 +12,14 @@ void getData() async {
   // getConversation();
   // getPhraseAndSentence();
   // getPhraseAndSentenceTest();
-  // testDownloadMp3();
   // getExpressions();
+  // getPhrasalVerbs();
 
   // download audio
   // scraper_audio.downloadConversationList();
-  scraper_audio.downloadPhraseList();
+  // scraper_audio.downloadPhraseList();
+  scraper_audio.downloadPhrasalVerbList();
+
 }
 
 void getExpressions() async {
@@ -74,7 +76,19 @@ void getPhraseAndSentence() async {
       jsonEncode(contentPhrasesAndSentences), "linkPhrasesAndSentences.json");
 }
 
-void getPhraseAndSentenceTest() async {
-  final linkPhrasesAndSentences = await novel_crawler.getPhraseAndSentence(
-      "https://basicenglishspeaking.com/037-id-hate-for-you-to/");
+void getPhrasalVerbs() async {
+  final linkPhrasalVerbs = await novel_crawler.getListPhrasalVerbs();
+  print(linkPhrasalVerbs);
+
+  final List<Map<String, dynamic>> contentPhrasalVerbs = [];
+  for (var e in linkPhrasalVerbs) {
+    print(e.url);
+    final contentPhrasalVerb = await novel_crawler.getPhrasalVerbs(e.url);
+    final contentMap = contentPhrasalVerb.toJson();
+
+    contentMap['index'] = contentPhrasalVerbs.length + 1;
+    contentPhrasalVerbs.add(contentMap);
+  }
+  createJsonFile(
+      jsonEncode(contentPhrasalVerbs), "linkPhrasalVerbs.json");
 }

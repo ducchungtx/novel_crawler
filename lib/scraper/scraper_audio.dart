@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:novel_crawler/models/audio_section.dart';
 import 'package:novel_crawler/models/conversation.dart';
+import 'package:novel_crawler/models/phrasal_verb.dart';
 import 'package:novel_crawler/models/phrase_and_sentence.dart';
 import 'package:novel_crawler/utils/utils.dart';
 
@@ -79,7 +80,6 @@ void downloadPhraseList() async {
   for (var e in listPhrases) {
     // Tải về e.audioUrl
     var audioPath = await downloadAndSaveMP3(e.title, e.audioUrl, 'phrase');
-    print(audioPath);
 
     // Update đường dẫn trong file JSON cho e.audioUrl
     var updatedAudioUrl = e.copyWith(newAudioUrl: audioPath);
@@ -107,4 +107,45 @@ void downloadPhraseList() async {
   // Cập nhật file JSON sau khi đã tải về và cập nhật đường dẫn
   jsonFile.writeAsStringSync(
       jsonEncode(listPhrases.map((e) => e.toJson()).toList()));
+}
+
+void downloadPhrasalVerbList() async {
+  // Gọi file json
+  final jsonFile = File('./output/linkPhrasalVerbs.json');
+  final jsonString = await jsonFile.readAsString();
+
+  // giải mã json
+  final jsonMap = jsonDecode(jsonString);
+  // Chuyển đổi json thành danh sách
+  List<PhrasalVerb> listPhrasalVerbs =
+      jsonMap.map<PhrasalVerb>((e) => PhrasalVerb.fromJson(e)).toList();
+
+  // Tạo thư mục conversation nếu nó không tồn tại
+  Directory('phrasal_verb').createSync();
+
+  // Danh sách các Future để sử dụng với Future.wait
+  List<Future<void>> downloadFutures = [];
+
+  // Loop qua danh sách conversation và bắt đầu quá trình tải về
+  for (var e in listPhrasalVerbs) {
+    
+    for(var content in e.contents){
+      downloadFutures.addAll(content.audioSections.map((audioSection) => downloadAndSaveMP3(e.title, audioSection.url, "phrasal_verb").then((audioSectionPath) {
+        // Create a new instance with the updated URL
+          var updatedAudioSection =
+              audioSection.copyWith(newUrl: audioSectionPath);
+
+          // Replace the old instance with the updated one
+          var index = content.audioSections.indexOf(audioSection);
+          content.audioSections[index] = updatedAudioSection;
+      })).toList());
+    }
+    // Đợi tất cả các Future hoàn thành trước khi chuyển sang conversation tiếp theo
+    await Future.wait<void>(downloadFutures);
+  }
+
+  // Cập nhật file JSON sau khi đã tải về và cập nhật đường dẫn
+  jsonFile.writeAsStringSync(
+      jsonEncode(listPhrasalVerbs.map((e) => e.toJson()).toList()));
+
 }
