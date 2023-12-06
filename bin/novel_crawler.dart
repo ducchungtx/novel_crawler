@@ -11,15 +11,16 @@ void main(List<String> arguments) {
 void getData() async {
   // getConversation();
   // getPhraseAndSentence();
-  // getPhraseAndSentenceTest();
   // getExpressions();
   // getPhrasalVerbs();
+  final idioms = await novel_crawler
+      .getCommonIdiom("https://basicenglishspeaking.com/idioms-money-finance/");
 
+  print(idioms);
   // download audio
   // scraper_audio.downloadConversationList();
   // scraper_audio.downloadPhraseList();
-  scraper_audio.downloadPhrasalVerbList();
-
+  // scraper_audio.downloadPhrasalVerbList();
 }
 
 void getExpressions() async {
@@ -89,6 +90,5 @@ void getPhrasalVerbs() async {
     contentMap['index'] = contentPhrasalVerbs.length + 1;
     contentPhrasalVerbs.add(contentMap);
   }
-  createJsonFile(
-      jsonEncode(contentPhrasalVerbs), "linkPhrasalVerbs.json");
+  createJsonFile(jsonEncode(contentPhrasalVerbs), "linkPhrasalVerbs.json");
 }

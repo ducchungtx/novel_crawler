@@ -8,6 +8,7 @@ import 'package:novel_crawler/models/audio_section.dart';
 import 'package:novel_crawler/models/conversation.dart';
 import 'package:novel_crawler/models/link.dart';
 import 'package:novel_crawler/models/phrase_and_sentence.dart';
+import 'package:universal_html/html.dart';
 
 Future<List<Link>> getListExpressions() async {
   final url = '$mainUrl/common-expressions-english/';
@@ -301,4 +302,41 @@ Future<PhrasalVerb> getPhrasalVerbs(String url) async {
   }).toList();
 
   return PhrasalVerb(title: title, contents: contentSections);
+}
+
+Future<List<Link>> getListCommonIdioms() async {
+  final url = '$mainUrl/102-common-english-idioms/';
+  final page = await scrapePage(url);
+
+  final links =
+      page.querySelectorAll('.thrv_contentbox_shortcode').map((element) {
+    final name = element.querySelector("h3");
+    final url = element.querySelector("a");
+    return Link(
+      url: url!.attributes['href']!,
+      name: name != null ? name.text!.trim() : "",
+    );
+  }).toList();
+  return links;
+}
+
+Future getCommonIdiom(String url) async {
+  final page = await scrapePage(url);
+
+  final title = page.querySelector('h1')!.text!.trim();
+  final audioUrl =
+      page.querySelector('.wp-audio-shortcode a')!.attributes['href']!;
+
+  final contentElements = page.querySelectorAll(".thrv_text_element");
+
+  var list = [];
+
+  final texts = contentElements
+      .map((element) => element.text!.trim())
+      .where((element) => element.isNotEmpty)
+      .toList();
+
+  print(title);
+  print(audioUrl);
+  print(texts);
 }
