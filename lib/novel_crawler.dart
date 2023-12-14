@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:novel_crawler/config/config.dart';
 import 'package:novel_crawler/models/content_section.dart';
 import 'package:novel_crawler/models/expression.dart';
+import 'package:novel_crawler/models/idiom.dart';
 import 'package:novel_crawler/models/phrasal_verb.dart';
 import 'package:novel_crawler/scraper/scraper.dart';
 
@@ -8,7 +11,6 @@ import 'package:novel_crawler/models/audio_section.dart';
 import 'package:novel_crawler/models/conversation.dart';
 import 'package:novel_crawler/models/link.dart';
 import 'package:novel_crawler/models/phrase_and_sentence.dart';
-import 'package:universal_html/html.dart';
 
 Future<List<Link>> getListExpressions() async {
   final url = '$mainUrl/common-expressions-english/';
@@ -332,11 +334,71 @@ Future getCommonIdiom(String url) async {
   var list = [];
 
   final texts = contentElements
-      .map((element) => element.text!.trim())
+      .map((element) {
+        String? audioUrl = "";
+        var audio = element.querySelector('.sc_player_container1');
+        if (audio != null) {
+          final button = audio.querySelector('.myButton_play');
+          if (button != null) {
+            final onclickValue = button.attributes['onclick'];
+            final urlMatch =
+                RegExp(r"'(http://[^']*)'").firstMatch(onclickValue ?? '');
+
+            if (urlMatch != null) {
+              final mp3Url = urlMatch.group(1);
+              audioUrl = mp3Url;
+            }
+          }
+        }
+        return {'text': element.text!.trim(), 'audioUrl': audioUrl};
+      })
       .where((element) => element.isNotEmpty)
       .toList();
 
-  print(title);
-  print(audioUrl);
-  print(texts);
+  // remove two firsts item in the texts variable
+  texts.removeAt(0);
+  texts.removeAt(0);
+
+  List<Idiom> idioms = [];
+
+  Idiom currentParent =
+      Idiom(sectionName: "", sectionSubtitle: "", children: []);
+
+  for (var item in texts) {
+    Idiom idiom =
+        Idiom(sectionName: item['text']!, sectionSubtitle: "", children: []);
+
+    if (item['audioUrl']!.isEmpty) {
+      // Nếu item có url rỗng, nó là cha của danh sách bên dưới nó
+      currentParent = idiom;
+      idioms.add(currentParent);
+    } else {
+      // Ngược lại, nó là con của cha hiện tại
+      currentParent.children.add(AudioSection(
+        // Thay thế 'AudioSection' bằng model thực tế của bạn nếu cần
+        // Giả sử bạn có một trường 'subtitle' trong 'AudioSection'
+        content: item['text']!,
+        url: item['audioUrl']!,
+      ));
+    }
+  }
+
+  final List<String> subtitles = page
+      .querySelectorAll('.thrv-styled-list-item')
+      .map((element) => element.text!.trim())
+      .toList();
+
+  idioms = idioms.map((e) {
+    return Idiom(
+      sectionName: e.sectionName,
+      sectionSubtitle: subtitles[idioms.indexOf(e)],
+      children: e.children,
+    );
+  }).toList();
+
+  return {
+    'title': title,
+    'audioUrl': audioUrl,
+    'idioms': idioms,
+  };
 }

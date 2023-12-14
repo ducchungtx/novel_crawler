@@ -13,10 +13,10 @@ void getData() async {
   // getPhraseAndSentence();
   // getExpressions();
   // getPhrasalVerbs();
-  final idioms = await novel_crawler
+  final idiom = await novel_crawler
       .getCommonIdiom("https://basicenglishspeaking.com/idioms-money-finance/");
 
-  print(idioms);
+  print(idiom);
   // download audio
   // scraper_audio.downloadConversationList();
   // scraper_audio.downloadPhraseList();
