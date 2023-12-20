@@ -128,17 +128,20 @@ void downloadPhrasalVerbList() async {
 
   // Loop qua danh sách conversation và bắt đầu quá trình tải về
   for (var e in listPhrasalVerbs) {
-    
-    for(var content in e.contents){
-      downloadFutures.addAll(content.audioSections.map((audioSection) => downloadAndSaveMP3(e.title, audioSection.url, "phrasal_verb").then((audioSectionPath) {
-        // Create a new instance with the updated URL
-          var updatedAudioSection =
-              audioSection.copyWith(newUrl: audioSectionPath);
+    for (var content in e.contents) {
+      downloadFutures.addAll(content.audioSections
+          .map((audioSection) =>
+              downloadAndSaveMP3(e.title, audioSection.url, "phrasal_verb")
+                  .then((audioSectionPath) {
+                // Create a new instance with the updated URL
+                var updatedAudioSection =
+                    audioSection.copyWith(newUrl: audioSectionPath);
 
-          // Replace the old instance with the updated one
-          var index = content.audioSections.indexOf(audioSection);
-          content.audioSections[index] = updatedAudioSection;
-      })).toList());
+                // Replace the old instance with the updated one
+                var index = content.audioSections.indexOf(audioSection);
+                content.audioSections[index] = updatedAudioSection;
+              }))
+          .toList());
     }
     // Đợi tất cả các Future hoàn thành trước khi chuyển sang conversation tiếp theo
     await Future.wait<void>(downloadFutures);
@@ -147,5 +150,6 @@ void downloadPhrasalVerbList() async {
   // Cập nhật file JSON sau khi đã tải về và cập nhật đường dẫn
   jsonFile.writeAsStringSync(
       jsonEncode(listPhrasalVerbs.map((e) => e.toJson()).toList()));
-
 }
+
+void downloadIdiom() {}
